@@ -1,0 +1,105 @@
+import java.util.Scanner;
+
+class ReservationSystem {
+    private static final int MAX_SEATS = 10;
+    private static boolean[] seats = new boolean[MAX_SEATS]; // false: available, true: reserved
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nWelcome to the Online Reservation System!");
+            System.out.println("1. Login");
+            System.out.println("2. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    login(scanner);
+                    break;
+                case 2:
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void login(Scanner scanner) {
+        System.out.print("Enter username: ");
+        String username = scanner.next();
+        System.out.print("Enter password: ");
+        String password = scanner.next();
+
+        // Simulate authentication
+        if (authenticate(username, password)) {
+            System.out.println("Login successful!");
+            showMenu(scanner);
+        } else {
+            System.out.println("Invalid username or password. Please try again.");
+        }
+    }
+
+    private static boolean authenticate(String username, String password) {
+        // Dummy authentication logic, replace with actual authentication mechanism
+        return username.equals("admin") && password.equals("admin123");
+    }
+
+    private static void showMenu(Scanner scanner) {
+        while (true) {
+            System.out.println("\n1. Reserve a seat");
+            System.out.println("2. Cancel reservation");
+            System.out.println("3. Logout");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    reserveSeat(scanner);
+                    break;
+                case 2:
+                    cancelReservation(scanner);
+                    break;
+                case 3:
+                    System.out.println("Logging out...");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void reserveSeat(Scanner scanner) {
+        System.out.print("Enter seat number (1-" + MAX_SEATS + "): ");
+        int seatNumber = scanner.nextInt();
+        if (seatNumber < 1 || seatNumber > MAX_SEATS) {
+            System.out.println("Invalid seat number. Please try again.");
+            return;
+        }
+
+        if (seats[seatNumber - 1]) {
+            System.out.println("Seat " + seatNumber + " is already reserved.");
+        } else {
+            seats[seatNumber - 1] = true;
+            System.out.println("Seat " + seatNumber + " reserved successfully.");
+        }
+    }
+
+    private static void cancelReservation(Scanner scanner) {
+        System.out.print("Enter seat number to cancel reservation (1-" + MAX_SEATS + "): ");
+        int seatNumber = scanner.nextInt();
+        if (seatNumber < 1 || seatNumber > MAX_SEATS) {
+            System.out.println("Invalid seat number. Please try again.");
+            return;
+        }
+
+        if (!seats[seatNumber - 1]) {
+            System.out.println("Seat " + seatNumber + " is not reserved.");
+        } else {
+            seats[seatNumber - 1] = false;
+            System.out.println("Reservation for seat " + seatNumber + " canceled successfully.");
+        }
+    }
+}

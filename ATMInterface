@@ -1,0 +1,160 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class ATMInterface {
+    private static final String[] USER_IDS = {"user1", "user2", "user3"};
+    private static final String[] PASSWORDS = {"pass1", "pass2", "pass3"};
+    private static final double[] BALANCES = {1000.0, 2000.0, 3000.0};
+    private static final ArrayList<String> TRANSACTION_HISTORY = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("Welcome to the ATM!");
+
+            // Authenticate user
+            int userIdx = authenticate(scanner);
+            if (userIdx != -1) {
+                System.out.println("Authentication successful. Welcome, " + USER_IDS[userIdx] + "!");
+                performTransactions(scanner, userIdx);
+            } else {
+                System.out.println("Authentication failed. Please try again or exit.");
+            }
+
+            System.out.print("Do you want to exit? (yes/no): ");
+            String choice = scanner.next();
+            if (choice.equalsIgnoreCase("yes")) {
+                exit = true;
+            }
+        }
+
+        System.out.println("Thank you for using the ATM!");
+        scanner.close();
+    }
+
+    private static int authenticate(Scanner scanner) {
+        System.out.print("Enter User ID: ");
+        String userId = scanner.next();
+        System.out.print("Enter Password: ");
+        String password = scanner.next();
+
+        for (int i = 0; i < USER_IDS.length; i++) {
+            if (USER_IDS[i].equals(userId) && PASSWORDS[i].equals(password)) {
+                return i; // Return the index of the authenticated user
+            }
+        }
+        return -1; // Authentication failed
+    }
+
+    private static void performTransactions(Scanner scanner, int userIdx) {
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("1. Check Balance");
+            System.out.println("2. Deposit");
+            System.out.println("3. Withdraw");
+            System.out.println("4. Transfer");
+            System.out.println("5. Transaction History");
+            System.out.println("6. Exit");
+            System.out.print("Choose an option: ");
+
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    checkBalance(userIdx);
+                    break;
+                case 2:
+                    deposit(scanner, userIdx);
+                    break;
+                case 3:
+                    withdraw(scanner, userIdx);
+                    break;
+                case 4:
+                    transfer(scanner, userIdx);
+                    break;
+                case 5:
+                    viewTransactionHistory(userIdx);
+                    break;
+                case 6:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+    private static void checkBalance(int userIdx) {
+        System.out.println("Your balance is: $" + BALANCES[userIdx]);
+    }
+
+    private static void deposit(Scanner scanner, int userIdx) {
+        System.out.print("Enter amount to deposit: $");
+        double amount = scanner.nextDouble();
+        if (amount > 0) {
+            BALANCES[userIdx] += amount;
+            System.out.println("Deposit successful. Your new balance is: $" + BALANCES[userIdx]);
+            TRANSACTION_HISTORY.add("Deposit of $" + amount + " into account " + USER_IDS[userIdx]);
+        } else {
+            System.out.println("Invalid amount. Please enter a positive value.");
+        }
+    }
+
+    private static void withdraw(Scanner scanner, int userIdx) {
+        System.out.print("Enter amount to withdraw: $");
+        double amount = scanner.nextDouble();
+        if (amount > 0) {
+            if (amount <= BALANCES[userIdx]) {
+                BALANCES[userIdx] -= amount;
+                System.out.println("Withdrawal successful. Your new balance is: $" + BALANCES[userIdx]);
+                TRANSACTION_HISTORY.add("Withdrawal of $" + amount + " from account " + USER_IDS[userIdx]);
+            } else {
+                System.out.println("Insufficient funds.");
+            }
+        } else {
+            System.out.println("Invalid amount. Please enter a positive value.");
+        }
+    }
+
+    private static void transfer(Scanner scanner, int userIdx) {
+        System.out.print("Enter the recipient's User ID: ");
+        String recipientUserId = scanner.next();
+        int recipientIdx = findUserIndex(recipientUserId);
+        if (recipientIdx != -1) {
+            System.out.print("Enter amount to transfer: $");
+            double amount = scanner.nextDouble();
+            if (amount > 0) {
+                if (amount <= BALANCES[userIdx]) {
+                    BALANCES[userIdx] -= amount;
+                    BALANCES[recipientIdx] += amount;
+                    System.out.println("Transfer successful. Your new balance is: $" + BALANCES[userIdx]);
+                    TRANSACTION_HISTORY.add("Transfer of $" + amount + " from account " + USER_IDS[userIdx] +
+                            " to account " + USER_IDS[recipientIdx]);
+                } else {
+                    System.out.println("Insufficient funds.");
+                }
+            } else {
+                System.out.println("Invalid amount. Please enter a positive value.");
+            }
+        } else {
+            System.out.println("Recipient not found.");
+        }
+    }
+
+    private static void viewTransactionHistory(int userIdx) {
+        System.out.println("Transaction History:");
+        for (String transaction : TRANSACTION_HISTORY) {
+            System.out.println(transaction);
+        }
+    }
+
+    private static int findUserIndex(String userId) {
+        for (int i = 0; i < USER_IDS.length; i++) {
+            if (USER_IDS[i].equals(userId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
